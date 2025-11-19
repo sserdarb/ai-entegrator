@@ -1,0 +1,23 @@
+<div class="fixed inset-0 bg-black/70 dark:bg-black/80 z-40 flex items-center justify-center" (click)="close.emit()">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-2xl w-full max-w-sm" (click)="$event.stopPropagation()">
+    <h3 class="text-xl font-bold mb-2 text-center text-gray-900 dark:text-white">Giriş Yap</h3>
+    <p class="text-center text-gray-500 dark:text-gray-400 mb-6">Özelliklere erişmek için giriş yapın.</p>
+    
+    <form (ngSubmit)="handleLogin()">
+      <div class="space-y-4">
+        <input type="text" [(ngModel)]="username" name="username" placeholder="Kullanıcı Adı (demo)"
+               class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-gray-100">
+        <input type="password" [(ngModel)]="password" name="password" placeholder="Şifre (password)"
+               class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-gray-100">
+      </div>
+      
+      @if(errorMessage()) {
+        <p class="text-red-500 dark:text-red-400 text-sm text-center mt-4">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+        Giriş Yap
+      </button>
+    </form>
+  </div>
+</div>

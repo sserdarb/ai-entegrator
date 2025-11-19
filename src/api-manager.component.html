@@ -1,0 +1,109 @@
+<div class="fixed inset-0 bg-black/70 dark:bg-black/80 z-40 flex items-center justify-center" (click)="close.emit()">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col" (click)="$event.stopPropagation()">
+    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">API Anahtar Yöneticisi</h3>
+        <p class="text-gray-500 dark:text-gray-400">Kayıtlı API kimlik bilgilerinizi yönetin.</p>
+      </div>
+       <button (click)="close.emit()" class="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    
+    <div class="p-6 overflow-y-auto">
+      <!-- List of saved credentials -->
+      <section>
+        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Kayıtlı Kimlik Bilgileri</h4>
+        @if (credentialService.credentials().length === 0) {
+          <p class="text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">Henüz kayıtlı kimlik bilgisi yok.</p>
+        } @else {
+          <div class="space-y-3">
+            @for(cred of credentialService.credentials(); track cred.apiName) {
+              <div class="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <div>
+                  <h5 class="font-bold text-gray-900 dark:text-gray-100">{{ cred.apiName }}</h5>
+                  <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    @for(pair of cred.pairs; track pair.key; let isLast = $last) {
+                      <span>{{ pair.key }}</span>@if(!isLast) {<span>, </span>}
+                    }
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <button (click)="startEditing(cred)" class="px-3 py-1 text-xs font-medium rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 transition-colors">
+                    Düzenle
+                  </button>
+                  <button (click)="removeCredential(cred.apiName)" class="p-2 rounded-md bg-red-100 hover:bg-red-200 dark:bg-red-900/50 dark:hover:bg-red-900 text-red-700 dark:text-red-300 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Add/Edit Form -->
+      <section class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ editingCredentialName() ? 'Kimlik Bilgisini Düzenle' : 'Yeni Kimlik Bilgisi Ekle' }}</h4>
+        <form #credForm="ngForm" (ngSubmit)="saveOrUpdateCredential()">
+          <div class="space-y-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div>
+                  <label for="apiSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">API Seçin</label>
+                  @if (editingCredentialName(); as name) {
+                    <input type="text" [value]="name" name="selectedApi" readonly
+                          class="w-full px-4 py-2 bg-gray-200 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-gray-100 cursor-not-allowed">
+                  } @else {
+                     <select [(ngModel)]="selectedApi" name="selectedApi" id="apiSelect" required
+                            class="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-gray-100">
+                        <option value="" disabled>Bir API seçin...</option>
+                        @for (api of apis; track api.name) {
+                            <option [value]="api.name" [disabled]="isApiSaved(api.name)">
+                                {{ api.name }} {{ isApiSaved(api.name) ? '(Kayıtlı)' : '' }}
+                            </option>
+                        }
+                    </select>
+                  }
+              </div>
+
+              <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Anahtar-Değer Çiftleri</label>
+                  <div class="space-y-2">
+                    @for(pair of credentialPairs(); track $index) {
+                      <div class="flex items-center gap-2">
+                        <input type="text" [(ngModel)]="pair.key" [name]="'key-' + $index" placeholder="Anahtar (örn: apiKey)" required
+                              class="flex-1 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100">
+                        <input type="text" [(ngModel)]="pair.value" [name]="'value-' + $index" placeholder="Değer" required
+                              class="flex-1 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100">
+                        <button type="button" (click)="removePair($index)" [disabled]="credentialPairs().length <= 1"
+                                class="p-2 rounded-md bg-red-100 hover:bg-red-200 dark:bg-red-900/50 dark:hover:bg-red-900 text-red-700 dark:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                  <button type="button" (click)="addPair()" class="mt-2 px-3 py-1 text-xs font-medium rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 transition-colors">
+                    + Anahtar Ekle
+                  </button>
+              </div>
+          </div>
+          <div class="flex justify-end gap-4 mt-4">
+              @if(editingCredentialName()) {
+                <button type="button" (click)="cancelEditing()" class="px-4 py-2 text-sm font-medium rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 transition-colors">
+                    İptal
+                </button>
+              }
+              <button type="submit" [disabled]="!credForm.valid || isFormInvalid()" class="px-4 py-2 text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:bg-gray-400 dark:disabled:bg-gray-500 disabled:cursor-not-allowed">
+                {{ editingCredentialName() ? 'Güncelle' : 'Kaydet' }}
+              </button>
+            </div>
+        </form>
+         <div class="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 mr-1 align-text-bottom" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path>
+            </svg>
+            Kimlik bilgileriniz yalnızca bu tarayıcının yerel depolama alanında güvenli bir şekilde saklanır.
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
