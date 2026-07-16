@@ -13,7 +13,10 @@ export interface ApiConnectionSettings {
 })
 export class AuthService {
   // Admin & User Auth State
-  currentUser = signal<User | null>({ username: 'demo', role: 'User' });
+  // Real identity comes from the shared PPG toolbox-auth SSO session
+  // (see checkSession() below) — no local password login anymore.
+  currentUser = signal<User | null>(null);
+  sessionChecked = signal(false);
   isAdmin = computed(() => this.currentUser()?.role === 'Admin');
   isUserLoggedIn = computed(() => !!this.currentUser());
 
@@ -29,6 +32,7 @@ export class AuthService {
   apiConnectionSettings = signal<Record<string, ApiConnectionSettings>>({});
 
   constructor() {
+    this.checkSession();
     // Örnek başlangıç ayarları
     this.apiConnectionSettings.set({
       'Google Gemini API': { region: 'global', timeout: 45000 },
@@ -78,17 +82,26 @@ export class AuthService {
     });
   }
 
-  login(username: string, password: string): User | null {
-    if (username === 'innovmar' && password === 'Tuba@2015Tuana') {
-      const adminUser: User = { username, role: 'Admin' };
-      this.currentUser.set(adminUser);
-      return adminUser;
+  // Local password login is disabled — this tool is only reachable via the
+  // PPG Toolbox panel's SSO redirect, which sets the shared session cookie
+  // before the app ever loads. See checkSession().
+  async checkSession(): Promise<void> {
+    try {
+      const res = await fetch('/toolbox/auth/me', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        this.currentUser.set({ username: data.name || data.email, role: data.role || 'User' });
+      } else {
+        this.currentUser.set(null);
+      }
+    } catch {
+      this.currentUser.set(null);
+    } finally {
+      this.sessionChecked.set(true);
     }
-    if (username === 'demo' && password === 'password') {
-      const demoUser: User = { username, role: 'User' };
-      this.currentUser.set(demoUser);
-      return demoUser;
-    }
+  }
+
+  login(_username: string, _password: string): User | null {
     return null;
   }
   
@@ -97,8 +110,11 @@ export class AuthService {
     return user?.role === 'Admin';
   }
 
-  logout() {
+  async logout() {
     this.currentUser.set(null);
+    try {
+      await fetch('/toolbox/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch { /* best-effort */ }
   }
   
   githubLogin() {

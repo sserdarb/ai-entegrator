@@ -1,0 +1,27 @@
+services:
+  ai-entegrator:
+    build:
+      context: .
+      args:
+        API_KEY: ${GEMINI_API_KEY}
+    image: ppg-ai-entegrator:local
+    container_name: ppg-ai-entegrator
+    restart: always
+    networks: [coolify]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
+      - "traefik.http.routers.ppgapibridge.rule=Host(`apibridge.161.97.132.250.sslip.io`)"
+      - "traefik.http.routers.ppgapibridge.entrypoints=https"
+      - "traefik.http.routers.ppgapibridge.tls=true"
+      - "traefik.http.routers.ppgapibridge.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ppgapibridge-toolbox.rule=Host(`ppg.pmapartner.com`) && PathPrefix(`/toolbox/ai-entegrator`)"
+      - "traefik.http.routers.ppgapibridge-toolbox.entrypoints=https"
+      - "traefik.http.routers.ppgapibridge-toolbox.tls=true"
+      - "traefik.http.routers.ppgapibridge-toolbox.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ppgapibridge-toolbox.service=ppgapibridge"
+      - "traefik.http.services.ppgapibridge.loadbalancer.server.port=80"
+
+networks:
+  coolify:
+    external: true
