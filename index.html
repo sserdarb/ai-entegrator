@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark">
+<html lang="tr" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <title>API Entegratör Platformu</title>
+  <title>TravelMate - Akıllı Seyahat Asistanı</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script>
@@ -12,8 +12,65 @@
     }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { 
+      font-family: 'Inter', sans-serif;
+      background-size: 200% 200%;
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(30, 20%, 95%, 0.3) 0px, transparent 50%),
+        radial-gradient(at 98% 1%, hsla(30, 20%, 95%, 0.4) 0px, transparent 50%),
+        linear-gradient(135deg, hsl(30, 10%, 98%), hsl(35, 20%, 96%), hsl(30, 10%, 98%));
+      animation: gradient-pan 15s ease infinite;
+    }
+    .dark body {
+       background-image: 
+        radial-gradient(at 0% 0%, hsla(220, 15%, 20%, 0.3) 0px, transparent 50%),
+        radial-gradient(at 98% 1%, hsla(220, 15%, 15%, 0.3) 0px, transparent 50%),
+        linear-gradient(135deg, hsl(220, 15%, 12%), hsl(220, 15%, 10%), hsl(220, 15%, 12%));
+    }
+    @keyframes gradient-pan {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* For hiding number input spinners */
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type='number'] {
+      -moz-appearance: textfield;
+    }
+
+    /* New Animations */
+    @keyframes pulse-pin {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+     @keyframes ken-burns {
+      0% { transform: scale(1) translate(0, 0); }
+      50% { transform: scale(1.1) translate(-2%, 2%); }
+      100% { transform: scale(1) translate(0, 0); }
+    }
+    .ken-burns-image {
+        animation: ken-burns 20s ease-in-out infinite;
+    }
+  </style>
+
 <script type="importmap">
 {
   "imports": {
@@ -29,12 +86,14 @@
     "@angular/forms": "https://next.esm.sh/@angular/forms@^20.3.12?external=rxjs",
     "@angular/common/http": "https://next.esm.sh/@angular/common@^20.3.12/http?external=rxjs",
     "@google/genai": "https://next.esm.sh/@google/genai@^1.29.1?external=rxjs",
-    "@angular/common": "https://next.esm.sh/@angular/common@^20.3.12?external=rxjs"
+    "@angular/common": "https://next.esm.sh/@angular/common@^20.3.12?external=rxjs",
+    "@angular/common/": "https://esm.sh/@angular/common@^21.1.5/"
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased transition-colors duration-300">
+<body class="text-gray-800 dark:text-gray-200 antialiased transition-colors duration-300 bg-stone-50 dark:bg-stone-950">
   <app-root></app-root>
 </body>
 </html>

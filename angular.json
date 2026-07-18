@@ -17,8 +17,7 @@
               "browser": "."
             },
             "browser": "index.tsx",
-            "tsConfig": "tsconfig.json",
-            "baseHref": "/toolbox/ai-entegrator/"
+            "tsConfig": "tsconfig.json"
           },
           "configurations": {
             "production": {
@@ -35,7 +34,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "port": 3000
+            "port": 3000,
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {

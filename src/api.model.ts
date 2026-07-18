@@ -1,110 +1,76 @@
-export interface TestParam {
+export interface TravelQuery {
+  departureCity: string;
+  destination: string;
+  departureDate: string;
+  returnDate: string;
+  pax: number;
+  budget: number;
+}
+
+export interface BudgetAnalysis {
+  original_cost: number;
+  user_budget: number;
+  gap: number;
+}
+
+export interface FlightDetails {
+  airline: string;
+  departureTime: string;
+  returnTime: string;
+  type: 'direct' | 'connecting';
+  pricePerPerson: number;
+  duration: string;
+}
+
+export interface HotelDetails {
   name: string;
-  label: string;
-  type: 'text' | 'password' | 'number';
-  required: boolean;
-  default?: string;
-  example?: string;
-}
-
-export interface AuthInfo {
-  type: 'apiKey' | 'oauth2_client_credentials' | 'basic_auth' | 'bearer_token' | 'custom_multi_field' | 'none';
+  rating: number;
+  location: 'Merkez' | 'Metroya Yakın' | 'Havaalanı Yakını' | 'Sakin Bölge';
+  pricePerNight: number;
+  style: 'Lüks' | 'Butik' | 'Ekonomik' | 'İş';
   description: string;
-  tokenUrl?: string;
-  params: TestParam[];
+  amenities: string[];
 }
 
-export interface Capability {
-  name:string;
-  description: string;
-  endpoint: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  params: TestParam[];
+export interface InteractiveCard {
+  id: number;
+  badge: string;
+  title: string;
+  details_summary: string;
+  total_price: number;
+  why_this_option: string;
+  flight_details?: FlightDetails;
+  primary_hotel?: HotelDetails;
+  alternative_hotels?: HotelDetails[];
 }
 
-export interface SdkInfo {
+export interface TravelPlanResponse {
+  assistant_reply: string;
+  status: 'success' | 'negotiation_needed';
+  budget_analysis: BudgetAnalysis;
+  interactive_cards: InteractiveCard[];
+}
+
+export interface FlightOffer {
+  airline: string;
+  departureTime: string;
+  returnTime: string;
+  pricePerPerson: number;
+  type: 'direct' | 'connecting';
+  duration: string;
+}
+
+export interface HotelOffer {
   name: string;
-  url: string;
+  rating: number;
+  location: 'Merkez' | 'Metroya Yakın' | 'Havaalanı Yakını' | 'Sakin Bölge';
+  pricePerNight: number;
+  style: 'Lüks' | 'Butik' | 'Ekonomik' | 'İş';
   description: string;
+  amenities: string[];
 }
 
-export interface GeneratedIntegration {
-  name: string;
-  description: string;
-  auth: AuthInfo;
-  capabilities: Capability[];
-  githubAnalysis?: {
-    popularSDKs: SdkInfo[];
-    usageExample: string;
-  };
-}
-
-export interface ApiInfo {
-  name: string;
-  description: string;
-  icon: string;
-  url: string;
-  category: string;
-  sectors: string[];
-  status: 'aktif' | 'sorun' | 'bakımda';
-  pricing: {
-    summary: string;
-    details?: string[];
-  };
-  pricingType: 'Ücretsiz' | 'Ücretli';
-  integrationTip: string;
-  apiKeyGuide: {
-    description: string;
-    url: string;
-  };
-  aiStudioRecommended: boolean;
-  codeExample: {
-    language: string;
-    code: string;
-  };
-}
-
-// FIX: Added PostmanCollection interface to resolve import error in gemini.service.ts
-export interface PostmanCollection {
-  info: {
-    name: string;
-    schema: string;
-    description?: string;
-  };
-  item: {
-    name: string;
-    request: {
-      method: string;
-      header: { key: string; value: string }[];
-      body?: {
-        mode: string;
-        raw: string;
-      };
-      url: {
-        raw: string;
-        host: string[];
-        path: string[];
-        query?: { key: string; value: string }[];
-      };
-    };
-  }[];
-  auth?: {
-    type: string;
-    bearer?: { key: string; value: string; type: string }[];
-    basic?: { key: string; value: string; type: string }[];
-  };
-}
-
-export interface User {
-  username: string;
-  role: 'Admin' | 'User';
-}
-
-export interface ApiBridge {
-  name: string;
-  sourceApi: string;
-  sourceCapability: string;
-  targetApi: string;
-  targetCapability: string;
-  // Further details like data mapping can be added here
+export interface AmadeusData {
+  flightOffers: FlightOffer[];
+  hotelOffers: HotelOffer[];
 }

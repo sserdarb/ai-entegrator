@@ -1,5 +1,5 @@
 {
-  "name": "Akıllı API Entegratör Platformu",
-  "description": "Bu platform, Gemini AI'yi kullanarak anında API entegrasyonları oluşturur, canlı testler yapar, birden fazla framework (Angular, React, Vue, WordPress) için kod üretir ve bu kodları dışa aktarır. Ayrıca yönetilebilir bir admin paneli içerir.",
+  "name": "TravelMate - Akıllı Seyahat Asistanı",
+  "description": "TravelMate, Amadeus GDS verileriyle desteklenen, bütçenize ve hayallerinize en uygun seyahat planlarını oluşturan çözüm odaklı ve empatik bir yapay zeka asistanıdır.",
   "requestFramePermissions": []
 }
